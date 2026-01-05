@@ -1,51 +1,31 @@
-import 'dotenv/config';
-import cors from 'cors';
-import express from 'express';
-import { connectDB } from './repository/db/db_connection.js';
-import authRoutes from './routes/auth.js';
+import "dotenv/config";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { createApp } from "./app.js";
+import { connectDB } from "./repository/db/db_connection.js";
 
 const PORT = process.env.SERVER_PORT || 3001;
 
 // Connect to the database
 await connectDB();
 
-const app = express();
+const httpServer = http.createServer();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+const io = new SocketIOServer(httpServer, {
+  cors: { origin: process.env.CLIENT_ORIGIN, credentials: true },
+});
 
-// Routes
-// app.use('/api/messages', messageRoutes);
-// app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    message: 'Backend server is running successfully!',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
+io.on("connection", (socket) => {
+  socket.on("page:join", (pageId) => {
+    socket.join(`page:${pageId}`);
+  });
+  socket.on("page:leave", (pageId) => {
+    socket.leave(`page:${pageId}`);
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Route not found',
-    message: `The route ${req.originalUrl} does not exist on this server`
-  });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: err.message
-  });
-});
+const app = createApp(io);
+httpServer.on("request", app);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
