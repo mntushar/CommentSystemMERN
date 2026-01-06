@@ -4,7 +4,12 @@ class Errors extends Error {
       super(errorOrMessage);
       this.productionError = errorOrMessage;
     } else {
-      super(JSON.stringify({ message: errorOrMessage.message, details: errorOrMessage }));
+      super(
+        JSON.stringify({
+          message: errorOrMessage.message,
+          details: errorOrMessage,
+        })
+      );
       this.productionError = productionError;
     }
     this.statusCode = statusCode;
@@ -21,13 +26,17 @@ class Errors extends Error {
   static throwError(error, res) {
     error = error instanceof Errors ? error : new Errors(error);
 
-    if (process.env.IS_DEVELOP === 'true') {
+    if (process.env.IS_DEVELOP === "true") {
       return res.status(error.statusCode).json(error.toJSON());
     }
 
     return res
       .status(error.statusCode)
-      .json({ message: error.productionError ?? 'Something went wrong. Please try again after some time.' });
+      .json({
+        message:
+          error.productionError ??
+          "Something went wrong. Please try again after some time.",
+      });
   }
 }
 

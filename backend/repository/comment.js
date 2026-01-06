@@ -26,7 +26,8 @@ export class CommentRepository {
 
     let sortStage = { createdAt: -1 };
     if (sort === "most_liked") sortStage = { likeCount: -1, createdAt: -1 };
-    if (sort === "most_disliked") sortStage = { dislikeCount: -1, createdAt: -1 };
+    if (sort === "most_disliked")
+      sortStage = { dislikeCount: -1, createdAt: -1 };
 
     const pipeline = [
       { $match: { pageId } },
@@ -43,13 +44,13 @@ export class CommentRepository {
 
     const [items, total] = await Promise.all([
       Comment.aggregate(pipeline),
-      Comment.countDocuments({ pageId })
+      Comment.countDocuments({ pageId }),
     ]);
 
     const ids = items.map((x) => x._id);
     const populated = await Comment.find({ _id: { $in: ids } })
       .populate("author", "username")
-      .lean()
+      .lean();
 
     const byId = new Map(populated.map((p) => [String(p._id), p]));
     const ordered = items.map((x) => byId.get(String(x._id))).filter(Boolean);

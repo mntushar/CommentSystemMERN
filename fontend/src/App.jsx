@@ -2,8 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import CommentPage from "./pages/CommentPage";
 import { userAuth } from "./hooks/userAuth";
-// import CommentPage from "./pages/CommentPage";
 
 function App() {
   const { isAuthenticated } = userAuth();
@@ -22,6 +22,16 @@ function App() {
             element={
               isAuthenticated ? (
                 <Navigate to="/page/demo-page" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/page/:pageId"
+            element={
+              isAuthenticated ? (
+                <CommentPage />
               ) : (
                 <Navigate to="/login" replace />
               )

@@ -20,7 +20,11 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = await this.userRepo.create({ userName, email, password:passwordHash });
+    const user = await this.userRepo.create({
+      userName,
+      email,
+      password: passwordHash,
+    });
 
     const token = signToken({ userId: user._id });
     return {

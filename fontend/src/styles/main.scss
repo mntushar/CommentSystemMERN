@@ -62,6 +62,40 @@ input, textarea, select {
   outline: none;
 }
 
+.muted { color: $muted; }
+.small { font-size: 12px; }
+.error { color: $danger; }
+
+.sortbar, .pagination {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.comment {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.comment-reply {
+  margin-left: 22px;
+  border-left: 3px solid rgba(255,255,255,0.15);
+}
+.comment-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.author { font-weight: 700; }
+.content { margin: 8px 0 10px; white-space: pre-wrap; }
+.comment-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+
 @media (max-width: 600px) {
   .container { padding: 16px; }
+  .comment-reply { margin-left: 10px; }
 }
