@@ -9,8 +9,8 @@ export class UserRepository {
         return await User.findOne({ email });
     }
 
-    async findByUsername(username) {
-        return await User.findOne({ username });
+    async findByUsername(userName) {
+        return await User.findOne({ userName });
     }
 
     async findById(id) {
