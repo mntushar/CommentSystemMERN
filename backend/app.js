@@ -3,8 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import authRoutes from './routes/auth.js'
-import commentRoutes from './routes/comment.js'
+import authRoutes from "./routes/auth.js";
+import commentRoutes from "./routes/comment.js";
 
 export function createApp(io) {
   const app = express();

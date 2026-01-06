@@ -1,5 +1,5 @@
 import z from "zod";
 
 export const commentEditSchema = z.object({
-  content: z.string().min(1).max(2000)
+  content: z.string().min(1).max(2000),
 });
