@@ -79,6 +79,40 @@ jobs:
             # Example: pm2
             pm2 startOrRestart ecosystem.config.js || pm2 restart all
 
+  deploy-frontend:
+    if: github.ref_name == 'deploy-frontend'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Frontend via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FRONTEND_HOST }}
+          username: ${{ secrets.FRONTEND_USER }}
+          key: ${{ secrets.FRONTEND_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/myapp
+            if [ ! -d commentsystemmern ]; then
+              git clone https://github.com/${{ github.repository }}.git commentsystemmern
+            fi
+            cd commentsystemmern
+            git fetch --all
+            git checkout deploy-frontend
+            git pull origin deploy-frontend
+
+            cd frontend
+            npm ci
+            npm run build
+
+            # Example: serve build with nginx OR pm2
+            # If nginx serves /var/www/html:
+            # rm -rf /var/www/html/*
+            # cp -r dist/* /var/www/html/
+            sudo systemctl reload nginx
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
