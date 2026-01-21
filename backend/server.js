@@ -9,7 +9,9 @@ const PORT = process.env.SERVER_PORT || 3001;
 // Connect to the database
 await connectDB();
 
-const httpServer = http.createServer();
+const app = createApp(null);
+
+const httpServer = http.createServer(app);
 
 const io = new SocketIOServer(httpServer, {
   cors: { origin: process.env.CLIENT_ORIGIN, credentials: true },
@@ -24,9 +26,9 @@ io.on("connection", (socket) => {
   });
 });
 
-const app = createApp(io);
-httpServer.on("request", app);
+// inject io into app so routes can use it
+app.set("io", io);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
