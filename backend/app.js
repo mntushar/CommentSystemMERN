@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.js";
 import commentRoutes from "./routes/comment.js";
 
-export function createApp(io) {
+export function createApp() {
   const app = express();
 
   app.use(helmet());
@@ -28,7 +28,7 @@ export function createApp(io) {
 
   // Routes
   app.use("/api/auth", authRoutes);
-  app.use("/api/comments", commentRoutes(io));
+  app.use("/api/comments", commentRoutes());
 
   // Health check endpoint
   app.get("/api/health", (req, res) => {
