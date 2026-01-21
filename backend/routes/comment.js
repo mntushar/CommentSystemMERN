@@ -1,14 +1,18 @@
 import express from "express";
 import { authRequired } from "../library/auth_mddleware.js";
 import Errors from "../library/errors.js";
-import { commentAddSchema } from "../repository/view_model/comment_add_schema.js";
-import { CommentService } from "../service/comment.js";
 import { validateObjectId } from "../library/validate_objectId.js";
+import { commentAddSchema } from "../repository/view_model/comment_add_schema.js";
 import { commentEditSchema } from "../repository/view_model/comment_edit_schema.js";
+import { CommentService } from "../service/comment.js";
 
-export default function commentRoutes(io) {
+export default function commentRoutes(ioFromCreateApp) {
   const router = express.Router();
   const service = new CommentService();
+
+  function getIO(req) {
+    return req.app.get("io") || ioFromCreateApp;
+  }
 
   router.post("/", authRequired(), async (req, res) => {
     try {
@@ -20,7 +24,9 @@ export default function commentRoutes(io) {
         authorId: req.user.id,
       });
 
-      io.to(`page:${body.pageId}`).emit("comment:created", created);
+      const io = getIO(req);
+      if (io) io.to(`page:${body.pageId}`).emit("comment:created", created);
+
       res.status(201).json(created);
     } catch (error) {
       return Errors.throwError(error, res);
@@ -60,7 +66,9 @@ export default function commentRoutes(io) {
           userId: req.user.id,
         });
 
-        io.to(`page:${updated.pageId}`).emit("comment:updated", updated);
+        const io = getIO(req);
+        if (io) io.to(`page:${updated.pageId}`).emit("comment:updated", updated);
+
         res.json(updated);
       } catch (error) {
         return Errors.throwError(error, res);
@@ -79,7 +87,9 @@ export default function commentRoutes(io) {
           userId: req.user.id,
         });
 
-        io.emit("comment:deleted", { id: req.params.id });
+        const io = getIO(req);
+        if (io) io.emit("comment:deleted", { id: req.params.id });
+
         res.json(deletedInfo);
       } catch (error) {
         return Errors.throwError(error, res);
@@ -97,7 +107,10 @@ export default function commentRoutes(io) {
           commentId: req.params.id,
           userId: req.user.id,
         });
-        io.to(`page:${updated.pageId}`).emit("comment:reaction", updated);
+
+        const io = getIO(req);
+        if (io) io.to(`page:${updated.pageId}`).emit("comment:reaction", updated);
+
         res.json(updated);
       } catch (error) {
         return Errors.throwError(error, res);
@@ -115,7 +128,10 @@ export default function commentRoutes(io) {
           commentId: req.params.id,
           userId: req.user.id,
         });
-        io.to(`page:${updated.pageId}`).emit("comment:reaction", updated);
+
+        const io = getIO(req);
+        if (io) io.to(`page:${updated.pageId}`).emit("comment:reaction", updated);
+
         res.json(updated);
       } catch (error) {
         return Errors.throwError(error, res);
