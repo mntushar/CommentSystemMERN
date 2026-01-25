@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       port: Number(env.VITE_PORT),
+      allowedHosts: [
+        env.ALLOW_HOST
+      ],
     },
     plugins: [react()],
   }
