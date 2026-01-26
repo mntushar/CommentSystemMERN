@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-frontend:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
+    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
     runs-on: ubuntu-latest
     steps:
       - name: Debug condition (runner)
