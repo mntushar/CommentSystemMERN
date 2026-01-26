@@ -7,15 +7,9 @@ on:
 
 jobs:
   deploy-frontend:
-    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-fontend'
     runs-on: ubuntu-latest
     steps:
-      - name: Debug condition (runner)
-        run: |
-          echo "merged=${{ github.event.pull_request.merged }}"
-          echo "base=${{ github.event.pull_request.base.ref }}"
-          echo "head=${{ github.event.pull_request.head.ref }}"
-
       - name: Checkout
         uses: actions/checkout@v4
 
