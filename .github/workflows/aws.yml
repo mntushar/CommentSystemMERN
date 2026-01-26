@@ -32,6 +32,8 @@ jobs:
             git fetch origin deploy-fontend
             git reset --hard origin/deploy-fontend
 
+            export NVM_DIR="$HOME/.nvm/nvm.sh"
+
             cd fontend
             npm ci
             npm run build
