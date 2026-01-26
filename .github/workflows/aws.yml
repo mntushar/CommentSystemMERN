@@ -39,7 +39,7 @@ jobs:
             pm2 startOrRestart ecosystem.config.js || pm2 restart all
 
   deploy-frontend:
-    if: github.ref_name == 'deploy-frontend'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
