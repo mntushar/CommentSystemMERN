@@ -29,10 +29,10 @@ jobs:
             set -e
             cd /var/www/html/CommentSystemMERN/
 
-            git fetch origin deploy-frontend
-            git reset --hard origin/deploy-frontend
+            git fetch origin deploy-fontend
+            git reset --hard origin/deploy-fontend
 
-            cd frontend
+            cd fontend
             npm ci
             npm run build
 
