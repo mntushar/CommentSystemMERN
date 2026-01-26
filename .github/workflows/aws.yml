@@ -40,6 +40,7 @@ jobs:
 
   deploy-frontend:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
+    echo "if ok"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,6 +52,7 @@ jobs:
           host: ${{ secrets.FRONTEND_HOST }}
           username: ${{ secrets.FRONTEND_USER }}
           key: ${{ secrets.FRONTEND_SSH_KEY }}
+          echo "key ok"
           script: |
             set -e
             cd /var/www/html/CommentSystemMERN/
@@ -64,3 +66,4 @@ jobs:
 
             pm2 restart Fontend || pm2 start npm --name "Fontend" -- run preview
             pm2 save
+          echo "script ok"
