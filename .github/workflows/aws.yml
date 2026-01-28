@@ -7,15 +7,9 @@ on:
 
 jobs:
   deploy-frontend:
-    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-frontend'
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-fontend'
     runs-on: ubuntu-latest
     steps:
-      - name: Debug condition (runner)
-        run: |
-          echo "merged=${{ github.event.pull_request.merged }}"
-          echo "base=${{ github.event.pull_request.base.ref }}"
-          echo "head=${{ github.event.pull_request.head.ref }}"
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -42,34 +36,31 @@ jobs:
             pm2 restart Fontend || pm2 start npm --name "Fontend" -- run preview
             pm2 save
 
-  # deploy-backend:
-  #   if: github.ref_name == 'deploy-backend'
-  #   name: Deploy-backend
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  deploy-backend:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'deploy-backend'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Deploy Backend via SSH
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.BACKEND_HOST }}
-  #         username: ${{ secrets.BACKEND_USER }}
-  #         key: ${{ secrets.BACKEND_SSH_KEY }}
-  #         script: |
-  #           set -e
-  #           cd /var/www/myapp
-  #           if [ ! -d commentsystemmern ]; then
-  #             git clone https://github.com/${{ github.repository }}.git commentsystemmern
-  #           fi
-  #           cd commentsystemmern
-  #           git fetch --all
-  #           git checkout deploy-backend
-  #           git pull origin deploy-backend
+      - name: Deploy Backend via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_HOST }}
+          username: ${{ secrets.FRONTEND_USER }}
+          key: ${{ secrets.FRONTEND_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/html/CommentSystemMERN/
 
-  #           cd backend
-  #           npm ci
-  #           npm run build || true
+            git fetch origin deploy-backend
+            git reset --hard origin/deploy-backend
 
-  #           # Example: pm2
-  #           pm2 startOrRestart ecosystem.config.js || pm2 restart all
+            export NVM_DIR="$HOME/.nvm"
+            source "$NVM_DIR/nvm.sh"
+
+            cd backend
+            npm ci
+
+            pm2 restart CommentSystemMERN || pm2 start npm --name "CommentSystemMERN" -- run start
+            pm2 save
