@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 export default function Pagination({ total, page, limit, onChange }) {
   const pages = Math.max(1, Math.ceil(total / limit));
   if (pages <= 1) return null;
