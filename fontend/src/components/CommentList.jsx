@@ -1,3 +1,5 @@
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable react/prop-types */
 import CommentItem from "./CommentItem";
 
 export default function CommentList({ comments }) {

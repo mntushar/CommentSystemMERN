@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/react-in-jsx-scope */
 export default function SortBar({ sort, onChange }) {
   return (
     <div className="sortbar">

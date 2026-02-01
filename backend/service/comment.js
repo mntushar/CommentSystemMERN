@@ -32,6 +32,10 @@ export class CommentService {
     return await this.commentRepo.findById(created._id);
   }
 
+  async getComment(commentId) {
+    return await this.commentRepo.findById(commentId);
+  }
+
   async editComment({ commentId, content, userId }) {
     const comment = await this.commentRepo.findById(commentId);
     if (!comment)
@@ -52,7 +56,7 @@ export class CommentService {
       throw Object.assign(new Error("Not allowed"), { status: 403 });
 
     await this.commentRepo.deleteById(commentId);
-    return { ok: true };
+    return comment;
   }
 
   async likeOnce({ commentId, userId }) {

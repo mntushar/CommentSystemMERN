@@ -106,7 +106,8 @@ const slice = createSlice({
       else state.items.unshift(incoming);
     },
     removeFromSocket(state, action) {
-      state.items = state.items.filter((c) => c._id !== action.payload.id);
+      const removeId = action.payload?.id ?? action.payload?._id;
+      state.items = state.items.filter((c) => c._id !== removeId);
       state.total = Math.max(0, state.total - 1);
     },
   },
@@ -128,9 +129,7 @@ const slice = createSlice({
         s.status = "failed";
         s.error = a.payload;
       })
-      .addCase(addComment.fulfilled, (s, a) => {
-        // optimistic local insert (socket will also send, but fine)
-        s.items.unshift(a.payload);
+      .addCase(addComment.fulfilled, (s) => {
         s.total += 1;
       })
       .addCase(editComment.fulfilled, (s, a) => {
@@ -138,7 +137,7 @@ const slice = createSlice({
         if (idx >= 0) s.items[idx] = a.payload;
       })
       .addCase(deleteComment.fulfilled, (s, a) => {
-        s.items = s.items.filter((c) => c._id !== a.payload.id);
+        s.items = s.items.filter((c) => c._id !== a.payload._id);
         s.total = Math.max(0, s.total - 1);
       })
       .addCase(likeComment.fulfilled, (s, a) => {

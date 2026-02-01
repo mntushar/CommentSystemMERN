@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { addComment } from "../store/commentManager";
 import { userAuth } from "../hooks/userAuth";
 
+// eslint-disable-next-line react/prop-types
 export default function CommentForm({ pageId, parentId = null, onDone }) {
   const { isAuthenticated } = userAuth();
   const dispatch = useDispatch();

@@ -18,6 +18,7 @@ export default function commentRoutes() {
         pageId: body.pageId,
         content: body.content,
         parentId: body.parentId || null,
+        // @ts-ignore
         authorId: req.user.id,
       });
 
@@ -36,10 +37,12 @@ export default function commentRoutes() {
         return res.status(400).json({ message: "pageId is required" });
 
       const sort = String(req.query.sort || "newest");
+      // @ts-ignore
       const page = Math.max(1, parseInt(req.query.page || "1", 10));
       const limit = Math.min(
         50,
-        Math.max(1, parseInt(req.query.limit || "10", 10))
+        // @ts-ignore
+        Math.max(1, parseInt(req.query.limit || "10", 10)),
       );
 
       const data = await service.list({ pageId, sort, page, limit });
@@ -59,6 +62,7 @@ export default function commentRoutes() {
         const updated = await service.editComment({
           commentId: req.params.id,
           content: body.content,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -68,7 +72,7 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.delete(
@@ -79,16 +83,20 @@ export default function commentRoutes() {
       try {
         const deletedInfo = await service.deleteComment({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
-        eventBus.emit("comment.deleted", { id: deletedInfo.commentId });
+        eventBus.emit("comment.deleted", {
+          id: deletedInfo._id,
+          pageId: deletedInfo.pageId,
+        });
 
         res.json(deletedInfo);
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.post(
@@ -99,6 +107,7 @@ export default function commentRoutes() {
       try {
         const updated = await service.likeOnce({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -108,7 +117,7 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.post(
@@ -119,6 +128,7 @@ export default function commentRoutes() {
       try {
         const updated = await service.dislikeOnce({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -128,7 +138,7 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   return router;
