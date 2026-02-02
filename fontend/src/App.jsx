@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";

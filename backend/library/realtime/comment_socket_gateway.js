@@ -1,6 +1,23 @@
+import { socketAuthRequired } from "../auth_mddleware.js";
 import { eventBus } from "./eventBus.js";
 
 export function commentSocketHandlers(io) {
+  io.use((socket, next) => {
+    try {
+      const token = socket.handshake.auth?.token;
+      if (!token) return next(new Error("Unauthorized: no token"));
+
+      const payload = socketAuthRequired(token);
+
+      socket.user = payload;
+
+      next();
+    } catch (err) {
+      console.log(err);
+      next(new Error("Unauthorized: invalid token"));
+    }
+  });
+
   io.on("connection", (socket) => {
     socket.on("page:join", (pageId) => {
       const room = `page:${pageId}`;

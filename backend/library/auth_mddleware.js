@@ -11,13 +11,24 @@ export function authRequired() {
       if (!token) return res.status(401).json({ message: "Missing token" });
 
       const decoded = verifyToken(token);
-      const user = await userRepo.findById(decoded.userId);
-      if (!user) return res.status(401).json({ message: "Invalid token" });
+      if (!decoded) return res.status(401).json({ message: "Invalid token" });
 
-      req.user = { id: user._id, username: user.userName, email: user.email };
+      // @ts-ignore
+      req.user = { id: decoded.id, username: decoded.username, email: decoded.email };
       next();
     } catch (e) {
       return res.status(401).json({ message: "Unauthorized" });
     }
   };
+}
+
+export function socketAuthRequired(token) {
+    try {
+      const decoded = verifyToken(token);
+      if (!decoded) throw Error('Invalid token');
+      // @ts-ignore
+      return{ id: decoded.id, username: decoded.username, email: decoded.email };
+    } catch (e) {
+      throw e;
+    }
 }
