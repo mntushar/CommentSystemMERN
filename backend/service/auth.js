@@ -26,7 +26,7 @@ export class AuthService {
       password: passwordHash,
     });
 
-    const token = signToken({ userId: user._id });
+    const token = signToken({ id: user._id, username: userName, email: email });
     return {
       user: { id: user._id, userName: user.userName, email: user.email },
       token,
@@ -42,7 +42,7 @@ export class AuthService {
     if (!ok)
       throw Object.assign(new Error("Invalid credentials"), { status: 401 });
 
-    const token = signToken({ userId: user._id });
+    const token = signToken({ id: user._id, username: user.userName, email: user.email });
     return {
       user: { id: user._id, userName: user.userName, email: user.email },
       token,

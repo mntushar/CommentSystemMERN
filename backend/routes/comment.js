@@ -14,6 +14,7 @@ export default function commentRoutes() {
   router.post("/", authRequired(), async (req, res) => {
     try {
       const body = commentAddSchema.parse(req.body);
+
       const created = await service.addComment({
         pageId: body.pageId,
         content: body.content,
@@ -21,7 +22,7 @@ export default function commentRoutes() {
         // @ts-ignore
         authorId: req.user.id,
       });
-
+      
       eventBus.emit("comment.created", created);
 
       res.status(201).json(created);
