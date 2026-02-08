@@ -92,6 +92,7 @@ const slice = createSlice({
   initialState: {
     items: [],
     total: 0,
+    totalComment: 0,
     page: 1,
     limit: 10,
     sort: "newest",
@@ -109,6 +110,10 @@ const slice = createSlice({
       const removeId = action.payload?.id ?? action.payload?._id;
       state.items = state.items.filter((c) => c._id !== removeId);
       state.total = Math.max(0, state.total - 1);
+    },
+    updateTotalCommentFromSocket(state, action) {
+      const data = action.payload;
+      state.totalComment = data.total;
     },
   },
   extraReducers(builder) {
@@ -151,5 +156,5 @@ const slice = createSlice({
   },
 });
 
-export const { upsertFromSocket, removeFromSocket } = slice.actions;
+export const { upsertFromSocket, removeFromSocket, updateTotalCommentFromSocket } = slice.actions;
 export default slice.reducer;

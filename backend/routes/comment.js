@@ -15,14 +15,14 @@ export default function commentRoutes() {
     try {
       const body = commentAddSchema.parse(req.body);
 
-      const created = await service.addComment({
+      const created = await service.addCommentWithCach({
         pageId: body.pageId,
         content: body.content,
         parentId: body.parentId || null,
         // @ts-ignore
         authorId: req.user.id,
       });
-      
+
       eventBus.emit("comment.created", created);
 
       res.status(201).json(created);
