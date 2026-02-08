@@ -13,7 +13,6 @@ export function commentSocketHandlers(io) {
 
       next();
     } catch (err) {
-      console.log(err);
       next(new Error("Unauthorized: invalid token"));
     }
   });
@@ -44,5 +43,9 @@ export function commentSocketHandlers(io) {
 
   eventBus.on("comment.reaction", ({ comment }) => {
     io.to(`page:${comment.pageId}`).emit("comment:reaction", comment);
+  });
+
+  eventBus.on("comment.count", ({ comment }) => {
+    io.to(`page:${comment.pageId}`).emit("comment:count", comment);
   });
 }
