@@ -5,14 +5,20 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "server-dev": "nodemon server.js",
+    "server-start": "node server.js",
+    "worker": "node library/job_queue/run_worker.js",
+    "rabbitmq-worker": "node library/pub_sub/run_worker.js",
+    "dev": "concurrently -n SERVER,WORKER,RABBIT -c blue,green,yellow \"npm run worker\" \"npm run server-dev\" \"npm run rabbitmq-worker\"",
+    "start": "concurrently -n SERVER,WORKER,RABBIT -c blue,green,yellow \"npm run server-start\" \"npm run worker\" \"npm run rabbitmq-worker\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.10.9",
     "bcryptjs": "^3.0.3",
+    "bullmq": "^5.67.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -21,10 +27,15 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2",
     "morgan": "^1.10.1",
+    "pino": "^10.3.0",
+    "redis": "^5.10.0",
+    "redis-om": "^0.4.7",
     "socket.io": "^4.8.3",
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11",
+    "pino-pretty": "^13.1.3"
   }
 }

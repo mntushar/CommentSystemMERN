@@ -13,7 +13,7 @@ export class CommentRepository {
     return await Comment.findByIdAndUpdate(
       id,
       { content },
-      { new: true }
+      { new: true },
     ).populate("author", "username");
   }
 
@@ -56,5 +56,11 @@ export class CommentRepository {
     const ordered = items.map((x) => byId.get(String(x._id))).filter(Boolean);
 
     return { items: ordered, total };
+  }
+
+  async getTotalComment(pageId) {
+    return await Comment.countDocuments({
+      pageId: pageId
+    });
   }
 }
