@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
-import { CommentRepository } from "../repository/comment.js";
-import { CommentRedisService } from "./redis_om/comment.js";
-import { eventBus } from "../library/realtime/eventBus.js";
 import {
   COMMENT_QUEUE_NAME,
   commentQueue,
 } from "../library/job_queue/comment/comment_queues.js";
+import { CommentRepository } from "../repository/comment.js";
+import { CommentRedisService } from "./redis_om/comment.js";
 
 export class CommentService {
   constructor() {

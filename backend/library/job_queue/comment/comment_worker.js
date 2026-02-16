@@ -14,6 +14,12 @@ import { CommentService } from "../../../service/comment.js";
 import { logger } from "../../logger.js";
 import { connectDB } from "../../../repository/db/db_connection.js";
 import { connectRedis } from "../../../repository/db/redis_om_connection.js";
+import { sendNotification } from "../../pub_sub/comment/publisher.js";
+import {
+  content_type,
+  notification_type,
+  x_match,
+} from "../../pub_sub/comment/comment_worker.js";
 
 export async function runCommentWorker() {
   const __filename = fileURLToPath(import.meta.url);
@@ -61,11 +67,7 @@ export async function runCommentWorker() {
 
   worker.on("failed", async (job, err) => {
     if (!job) {
-      logger.error(
-        "[worker] failed (job missing):",
-        // @ts-ignore
-        err
-      );
+      logger.error(err);
       return;
     }
 
@@ -89,12 +91,20 @@ export async function runCommentWorker() {
     }
   });
 
-  // @ts-ignore
-  worker.on("error", (err) => logger.error("worker error", err));
+  worker.on("error", (err) => logger.error(err));
 
   // QueueEvents (optional but useful)
   commentQueueEvents.on("completed", ({ jobId, returnvalue }) => {
-    logger.info(`[events] completed jobId=${jobId} return=${returnvalue}`);
+    logger.info(`[events] completed jobId=${jobId} return=${JSON.stringify(returnvalue)}`);
+
+    sendNotification(
+      {
+        "x-match": x_match,
+        "notification-type": notification_type,
+        "content-type": content_type,
+      },
+      returnvalue,
+    );
   });
 
   commentQueueEvents.on("failed", ({ jobId, failedReason }) => {
