@@ -6,6 +6,7 @@ import {
   fetchComments,
   removeFromSocket,
   upsertFromSocket,
+  updateTotalCommentFromSocket,
 } from "../store/commentManager";
 import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
@@ -46,11 +47,13 @@ export default function CommentPage() {
     const onUpdated = (c) => dispatch(upsertFromSocket(c));
     const onReaction = (c) => dispatch(upsertFromSocket(c));
     const onDeleted = (payload) => dispatch(removeFromSocket(payload));
+    const onTotal = (payload) => dispatch(updateTotalCommentFromSocket(payload));
 
     socket.on("comment:created", onCreated);
     socket.on("comment:updated", onUpdated);
     socket.on("comment:reaction", onReaction);
     socket.on("comment:deleted", onDeleted);
+    socket.on("comment:count", onTotal);
 
     return () => {
       socket.emit("page:leave", pageId);
@@ -58,6 +61,7 @@ export default function CommentPage() {
       socket.off("comment:updated", onUpdated);
       socket.off("comment:reaction", onReaction);
       socket.off("comment:deleted", onDeleted);
+      socket.off("comment:count", onTotal);
     };
   }, [dispatch, pageId, socket]);
 
