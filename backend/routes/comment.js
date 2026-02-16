@@ -6,6 +6,7 @@ import { validateObjectId } from "../library/validate_objectId.js";
 import { commentAddSchema } from "../repository/view_model/comment_add_schema.js";
 import { commentEditSchema } from "../repository/view_model/comment_edit_schema.js";
 import { CommentService } from "../service/comment.js";
+import { commentRefreshSchema } from "../repository/view_model/comment_refresh_schema.js";
 
 export default function commentRoutes() {
   const router = express.Router();
@@ -26,6 +27,18 @@ export default function commentRoutes() {
       eventBus.emit("comment.created", created);
 
       res.status(201).json(created);
+    } catch (error) {
+      return Errors.throwError(error, res);
+    }
+  });
+
+  router.post("/refresh", async (req, res) => {
+    try {
+      const comment = commentRefreshSchema.parse(req.body);
+
+      eventBus.emit("comment.count", { comment });
+
+      res.status(201).json('ok');
     } catch (error) {
       return Errors.throwError(error, res);
     }
