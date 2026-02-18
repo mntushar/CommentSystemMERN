@@ -1,5 +1,5 @@
 import express from "express";
-import { authRequired } from "../library/auth_mddleware.js";
+import { authRequired, hmacAuthRequired } from "../library/auth_mddleware.js";
 import Errors from "../library/errors.js";
 import { eventBus } from "../library/realtime/eventBus.js";
 import { validateObjectId } from "../library/validate_objectId.js";
@@ -12,7 +12,7 @@ export default function commentRoutes() {
   const router = express.Router();
   const service = new CommentService();
 
-  router.post("/", authRequired(), async (req, res) => {
+  router.post("/", authRequired, async (req, res) => {
     try {
       const body = commentAddSchema.parse(req.body);
 
@@ -32,7 +32,7 @@ export default function commentRoutes() {
     }
   });
 
-  router.post("/refresh", async (req, res) => {
+  router.post("/refresh", hmacAuthRequired, async (req, res) => {
     try {
       const comment = commentRefreshSchema.parse(req.body);
 
@@ -44,7 +44,7 @@ export default function commentRoutes() {
     }
   });
 
-  router.get("/", authRequired(), async (req, res) => {
+  router.get("/", authRequired, async (req, res) => {
     try {
       const pageId = String(req.query.pageId || "");
       if (!pageId)
@@ -68,7 +68,7 @@ export default function commentRoutes() {
 
   router.put(
     "/:id",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
@@ -91,7 +91,7 @@ export default function commentRoutes() {
 
   router.delete(
     "/:id",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
@@ -115,7 +115,7 @@ export default function commentRoutes() {
 
   router.post(
     "/:id/like",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
@@ -136,7 +136,7 @@ export default function commentRoutes() {
 
   router.post(
     "/:id/dislike",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {

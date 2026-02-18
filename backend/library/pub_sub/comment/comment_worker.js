@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import { rabbitmqConnection } from "../../../repository/db/rabbitmq_connection.js";
+import { createHmacSignature } from "../../hmac.js";
 import { logger } from "../../logger.js";
 import { exchange, exchangeType } from "./publisher.js";
 
@@ -39,11 +40,21 @@ export const commentWorkerNotifications = async () => {
         if (!msg) throw new Error("Message is empty");
 
         const message = JSON.parse(msg.content.toString());
+
+        const bodyString = JSON.stringify(message);
+        const signature = createHmacSignature(
+          process.env.HMAC_SECRET,
+          bodyString,
+        );
+
         const response = await fetch(
           `${process.env.SERVER_ORIGIN}/api/comments/refresh`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "x-signature": signature, 
+            },
             body: JSON.stringify(message),
           },
         );
