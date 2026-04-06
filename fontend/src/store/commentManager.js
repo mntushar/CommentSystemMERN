@@ -92,6 +92,7 @@ const slice = createSlice({
   initialState: {
     items: [],
     total: 0,
+    totalComment: 0,
     page: 1,
     limit: 10,
     sort: "newest",
@@ -106,8 +107,13 @@ const slice = createSlice({
       else state.items.unshift(incoming);
     },
     removeFromSocket(state, action) {
-      state.items = state.items.filter((c) => c._id !== action.payload.id);
+      const removeId = action.payload?.id ?? action.payload?._id;
+      state.items = state.items.filter((c) => c._id !== removeId);
       state.total = Math.max(0, state.total - 1);
+    },
+    updateTotalCommentFromSocket(state, action) {
+      const data = action.payload;
+      state.totalComment = data.total;
     },
   },
   extraReducers(builder) {
@@ -128,9 +134,7 @@ const slice = createSlice({
         s.status = "failed";
         s.error = a.payload;
       })
-      .addCase(addComment.fulfilled, (s, a) => {
-        // optimistic local insert (socket will also send, but fine)
-        s.items.unshift(a.payload);
+      .addCase(addComment.fulfilled, (s) => {
         s.total += 1;
       })
       .addCase(editComment.fulfilled, (s, a) => {
@@ -138,7 +142,7 @@ const slice = createSlice({
         if (idx >= 0) s.items[idx] = a.payload;
       })
       .addCase(deleteComment.fulfilled, (s, a) => {
-        s.items = s.items.filter((c) => c._id !== a.payload.id);
+        s.items = s.items.filter((c) => c._id !== a.payload._id);
         s.total = Math.max(0, s.total - 1);
       })
       .addCase(likeComment.fulfilled, (s, a) => {
@@ -152,5 +156,5 @@ const slice = createSlice({
   },
 });
 
-export const { upsertFromSocket, removeFromSocket } = slice.actions;
+export const { upsertFromSocket, removeFromSocket, updateTotalCommentFromSocket } = slice.actions;
 export default slice.reducer;

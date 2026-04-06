@@ -1,23 +1,26 @@
 import express from "express";
-import { authRequired } from "../library/auth_mddleware.js";
+import { authRequired, hmacAuthRequired } from "../library/auth_mddleware.js";
 import Errors from "../library/errors.js";
 import { eventBus } from "../library/realtime/eventBus.js";
 import { validateObjectId } from "../library/validate_objectId.js";
 import { commentAddSchema } from "../repository/view_model/comment_add_schema.js";
 import { commentEditSchema } from "../repository/view_model/comment_edit_schema.js";
 import { CommentService } from "../service/comment.js";
+import { commentRefreshSchema } from "../repository/view_model/comment_refresh_schema.js";
 
 export default function commentRoutes() {
   const router = express.Router();
   const service = new CommentService();
 
-  router.post("/", authRequired(), async (req, res) => {
+  router.post("/", authRequired, async (req, res) => {
     try {
       const body = commentAddSchema.parse(req.body);
-      const created = await service.addComment({
+
+      const created = await service.addCommentWithCach({
         pageId: body.pageId,
         content: body.content,
         parentId: body.parentId || null,
+        // @ts-ignore
         authorId: req.user.id,
       });
 
@@ -29,17 +32,31 @@ export default function commentRoutes() {
     }
   });
 
-  router.get("/", authRequired(), async (req, res) => {
+  router.post("/refresh", hmacAuthRequired, async (req, res) => {
+    try {
+      const comment = commentRefreshSchema.parse(req.body);
+
+      eventBus.emit("comment.count", { comment });
+
+      res.status(201).json('ok');
+    } catch (error) {
+      return Errors.throwError(error, res);
+    }
+  });
+
+  router.get("/", authRequired, async (req, res) => {
     try {
       const pageId = String(req.query.pageId || "");
       if (!pageId)
         return res.status(400).json({ message: "pageId is required" });
 
       const sort = String(req.query.sort || "newest");
+      // @ts-ignore
       const page = Math.max(1, parseInt(req.query.page || "1", 10));
       const limit = Math.min(
         50,
-        Math.max(1, parseInt(req.query.limit || "10", 10))
+        // @ts-ignore
+        Math.max(1, parseInt(req.query.limit || "10", 10)),
       );
 
       const data = await service.list({ pageId, sort, page, limit });
@@ -51,7 +68,7 @@ export default function commentRoutes() {
 
   router.put(
     "/:id",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
@@ -59,6 +76,7 @@ export default function commentRoutes() {
         const updated = await service.editComment({
           commentId: req.params.id,
           content: body.content,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -68,37 +86,42 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.delete(
     "/:id",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
         const deletedInfo = await service.deleteComment({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
-        eventBus.emit("comment.deleted", { id: deletedInfo.commentId });
+        eventBus.emit("comment.deleted", {
+          id: deletedInfo._id,
+          pageId: deletedInfo.pageId,
+        });
 
         res.json(deletedInfo);
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.post(
     "/:id/like",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
         const updated = await service.likeOnce({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -108,17 +131,18 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   router.post(
     "/:id/dislike",
-    authRequired(),
+    authRequired,
     validateObjectId("id"),
     async (req, res) => {
       try {
         const updated = await service.dislikeOnce({
           commentId: req.params.id,
+          // @ts-ignore
           userId: req.user.id,
         });
 
@@ -128,7 +152,7 @@ export default function commentRoutes() {
       } catch (error) {
         return Errors.throwError(error, res);
       }
-    }
+    },
   );
 
   return router;
