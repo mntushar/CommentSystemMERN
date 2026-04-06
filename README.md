@@ -9,13 +9,15 @@
 - Sorting: newest / most liked / most disliked
 - Pagination
 - Real-time updates using Socket.io
+- Pub/Sub and job queue
 - Optional replies (one-level threading via `parentId`)
 
 ---
 
 ## Tech Stack
-- Backend: Node.js, Express.js, MongoDB (Mongoose), JWT, Socket.io
+- Backend: Node.js, Express.js, MongoDB (Mongoose), JWT, Socket.io, BullMq, RabbitMq
 - Frontend: React (Vite), Redux Toolkit, React Router, Axios, Sass
+- CI/CD: git, Terraform, Aws
 
 ---
 

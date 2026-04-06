@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { userAuth } from "../hooks/userAuth";

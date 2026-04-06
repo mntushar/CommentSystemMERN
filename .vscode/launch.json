@@ -1,0 +1,50 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Backend Server",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/server.js",
+            "cwd": "${workspaceFolder}/backend",
+            "envFile": "${workspaceFolder}/backend/.env",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Debug: Worker",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/library/job_queue/run_worker.js",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "envFile": "${workspaceFolder}/backend/.env"
+        },
+        {
+            "name": "Debug: RabbitMQ Worker",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/backend/library/pub_sub/run_worker.js",
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "envFile": "${workspaceFolder}/backend/.env"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug: Dev (Server + Worker + Rabbit)",
+            "configurations": [
+                "Debug: Backend Server",
+                "Debug: Worker",
+                "Debug: RabbitMQ Worker"
+            ],
+            "stopAll": true
+        }
+    ]
+}
